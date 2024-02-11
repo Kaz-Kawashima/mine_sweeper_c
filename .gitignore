@@ -1,3 +1,11 @@
+# VisualStudio
+.vs
+x64 
+*.sln
+*.vcxproj
+*.filters
+*.user
+
 # Prerequisites
 *.d
 
