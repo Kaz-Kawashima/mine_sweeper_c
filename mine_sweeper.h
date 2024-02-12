@@ -6,6 +6,8 @@ typedef struct{
     int size_x;
     int field_size_y;
     int field_size_x;
+    int cursor_row;
+    int cursor_col;
 } GameBoard;
 
 void init(GameBoard* gb, int y, int x, int bomb_num);

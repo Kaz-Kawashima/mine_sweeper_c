@@ -27,10 +27,15 @@ void new_boarder_panel(Panel* p){
 }
 
 void flag(Panel* p){
-    if (p->is_flagged) {
-        p->is_flagged = false;
-    } else {
-        p->is_flagged = true;
+    if (!p->is_open) {
+        if (p->is_flagged) {
+            p->is_flagged = false;
+            p->display = '#';
+        }
+        else {
+            p->is_flagged = true;
+            p->display = 'F';
+        }
     }
 }
 

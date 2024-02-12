@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <conio.h>
 
 #define BUFF_LENGTH 16
 
@@ -76,7 +77,12 @@ void calc_bomb_value_all(GameBoard* gb) {
 
 void init(GameBoard* gb, int y, int x, int bomb_num){
     Panel* p;
+    //init random generator
     srand((unsigned int)time(NULL));
+    //init cursor
+    gb->cursor_col = 1;
+    gb->cursor_row = 1;
+    //init game board
     gb->size_y = y;
     gb->size_x = x;
     int field_size_y = y + 2;
@@ -114,6 +120,7 @@ void print_gb(GameBoard* gb) {
     int buff_size = (gb->field_size_x * 2 + 1) * gb->field_size_y + 1;
     char* buff = malloc(sizeof(char) * buff_size);
     int pos = 0;
+    //print game board
     for(int row = 0; row < gb->field_size_y; row++){
         for(int col = 0; col < gb->field_size_x; col++){
             Panel* p = get_panel(gb, row, col);
@@ -127,42 +134,86 @@ void print_gb(GameBoard* gb) {
         pos++;
     }
     buff[pos] = 0;
+    //print_cursor_row;
+    pos = (gb->field_size_x * 2 + 1) * gb->cursor_row;
+    buff[pos] = '>';
+    pos += (gb->field_size_x * 2 - 2);
+    buff[pos] = '<';
+    //print_cursor_row;
+    pos = gb->cursor_col * 2;
+    buff[pos] = 'v';
+    pos += (gb->field_size_x * 2 + 1) * (gb->field_size_y - 1);
+    buff[pos] = '^';
+    system("cls");    //windows
+    //system("clear"); //linux
+    //princ_cursor
+    Panel* p = get_panel(gb, gb->cursor_row, gb->cursor_col);
+    if (!p->is_open && !p->is_flagged) {
+        pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
+        buff[pos] = '*';
+    }
     printf(buff);
     free(buff);
 }
 
-void key_input(GameBoard* gb, int* y, int* x) {
 
-    int max_y = gb->size_y;
-    int max_x = gb->size_x;
+bool key_input(GameBoard* gb) {
 
-    int input = 0;
-    bool y_ok = false;
-    bool x_ok = false;
+    printf("\ninput <- ^v -> / O open / F flag\n");
 
-    while (!y_ok) {
-        printf("input y:\n");
-        int ret = scanf("%d", &input);
+    bool finished = false;
+    bool safe = true;
+    Panel* p = 0;
 
-        if (ret) {
-            if ((1 <= input) && (input <= max_y)) {
-                *y = input;
-                y_ok = true;
-            }
+    do{
+        finished = true;
+        char input = _getch();
+        if (input == 0x00 || input == 0xe0) {
+            input = _getch();
         }
-    }
-    while (!x_ok) {
-        printf("input x:\n");
-        int ret = scanf("%d", &input);
-
-        if (ret) {
-            if ((1 <= input) && (input <= max_x)) {
-                *x = input;
-                x_ok = true;
-            }
+        switch (input) {
+            case(0x4b):
+                gb->cursor_col--;
+                break;
+            case(0x48):
+                gb->cursor_row--;
+                break;
+            case(0x50):
+                gb->cursor_row++;
+                break;
+            case(0x4d):
+                gb->cursor_col++;
+                break;
+            case('O'):
+            case('o'):
+                p = get_panel(gb, gb->cursor_row, gb->cursor_col);
+                safe = open(p);
+                break;
+            case('F'):
+            case('f'):
+                p = get_panel(gb, gb->cursor_row, gb->cursor_col);
+                flag(p);
+                break;
+            default:
+                finished = false;
         }
-    }
+        if (gb->cursor_row < 1) {
+            gb->cursor_row = 1;
+        }
+        if (gb->cursor_row > gb->size_y) {
+            gb->cursor_row = gb->size_y;
+        }
+        if (gb->cursor_col < 1) {
+            gb->cursor_col = 1;
+        }
+        if (gb->cursor_col > gb->size_x) {
+            gb->cursor_col = gb->size_x;
+        }
+    } while (!finished);
+
+    return safe;
 }
+
 
 
 int open_around(GameBoard* gb, int y, int x) {
@@ -220,22 +271,22 @@ void mine_sweeper_cli(int y, int x, int bomb_num) {
     init(gb, y, x, bomb_num);
     while (true) {
         print_gb(gb);
-        key_input(gb, &row, &col);
-        Panel* p = get_panel(gb, row, col);
-        bool safe = open(p);
+        bool safe = key_input(gb);
         if(safe){
             cascade_open(gb);
             finished = is_finished(gb);
             if (finished) {
                 print_gb(gb);
-                printf("You Win!");
+                printf("You Win!\n\nhit any key...");
+                _getch();
                 return;
             }
         }
         else {
             bomb_open(gb);
             print_gb(gb);
-            printf("Game Over!");
+            printf("Game Over!\n\nhit any key...");
+            _getch();
             return;
         }
     }
