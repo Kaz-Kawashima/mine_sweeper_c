@@ -148,9 +148,12 @@ void print_gb(GameBoard* gb) {
     //system("clear"); //linux
     //princ_cursor
     Panel* p = get_panel(gb, gb->cursor_row, gb->cursor_col);
+    pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
     if (!p->is_open && !p->is_flagged) {
-        pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
         buff[pos] = '*';
+    }
+    else if (p->is_open && p->bomb_value == 0 && !p->is_bomb) {
+        buff[pos] = '_';
     }
     printf(buff);
     free(buff);
@@ -258,7 +261,15 @@ bool is_finished(GameBoard* gb) {
     return true;
 }
 
-void bomb_open(GameBoard* g) {
+void bomb_open(GameBoard* gb) {
+    for (int row = 1; row <= gb->size_y; row++) {
+        for (int col = 1; col <= gb->size_x; col++) {
+            Panel* p = get_panel(gb, row, col);
+            if (p->is_bomb) {
+                open(p);
+            }
+        }
+    }
     return;
 }
 
