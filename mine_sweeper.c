@@ -150,9 +150,9 @@ void print_gb(GameBoard* gb) {
     Panel* p = get_panel(gb, gb->cursor_row, gb->cursor_col);
     pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
     if (!p->is_open && !p->is_flagged) {
-        buff[pos] = '*';
+        buff[pos] = '@';
     }
-    else if (p->is_open && p->bomb_value == 0 && !p->is_bomb) {
+    else if (p->is_open && !p->is_bomb) {
         buff[pos] = '_';
     }
     printf(buff);
