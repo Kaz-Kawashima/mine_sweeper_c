@@ -1,6 +1,6 @@
 #include "panel.h"
 
-#define itoc(i)(i + 48);
+#define itoc(i) ((i) + '0');
 
 void new_blank_panel(Panel* p){
     p->display = '#';
@@ -18,7 +18,7 @@ void new_bomb_panel(Panel* p){
     p->is_flagged = false;
 }
 
-void new_boarder_panel(Panel* p){
+void new_border_panel(Panel* p){
     p->display = '=';
     p->bomb_value = 0;
     p->is_open = true;

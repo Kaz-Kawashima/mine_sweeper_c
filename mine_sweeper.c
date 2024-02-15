@@ -100,20 +100,24 @@ void init(GameBoard* gb, int y, int x, int bomb_num){
     }
     //Set Bomb
     set_bomb(gb, bomb_num);
-    //Fill Boarder
+    //Fill Border
     for (int row = 0; row < field_size_y; row++){
         p = get_panel(gb, row, 0);
-        new_boarder_panel(p);
+        new_border_panel(p);
         p = get_panel(gb, row, field_size_x -1);
-        new_boarder_panel(p);
+        new_border_panel(p);
     }
     for (int col = 0; col < field_size_x; col++){
         p = get_panel(gb, 0, col);
-        new_boarder_panel(p);
+        new_border_panel(p);
         p = get_panel(gb, field_size_y - 1, col);
-        new_boarder_panel(p);
+        new_border_panel(p);
     }
     calc_bomb_value_all(gb);
+}
+
+void del(GameBoard* gb) {
+    free(gb->panel_mat);
 }
 
 void print_gb(GameBoard* gb) {
@@ -159,10 +163,25 @@ void print_gb(GameBoard* gb) {
     free(buff);
 }
 
+int count_flag(GameBoard* gb) {
+    int counter = 0;
+    for (int row = 1; row <= gb->size_y; row++) {
+        for (int col = 1; col <= gb->size_x; col++) {
+            Panel* p = get_panel(gb, row, col);
+            if (p->is_flagged) {
+                counter++;
+            }
+        }
+    }
+    return counter;
+}
+
 
 bool key_input(GameBoard* gb) {
 
-    printf("\ninput <- ^v -> / O open / F flag\n");
+    int flag_count = count_flag(gb);
+
+    printf("\ninput <- ^v -> / O open / F flag (%d)\n", flag_count);
 
     bool finished = false;
     bool safe = true;
@@ -290,7 +309,7 @@ void mine_sweeper_cli(int y, int x, int bomb_num) {
                 print_gb(gb);
                 printf("You Win!\n\nhit any key...");
                 _getch();
-                return;
+                break;
             }
         }
         else {
@@ -298,7 +317,8 @@ void mine_sweeper_cli(int y, int x, int bomb_num) {
             print_gb(gb);
             printf("Game Over!\n\nhit any key...");
             _getch();
-            return;
+            break;
         }
     }
+    del(gb);
 }
