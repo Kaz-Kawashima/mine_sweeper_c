@@ -1,5 +1,12 @@
 #include "Panel.h"
 
+typedef enum {
+    Uninitialized,
+    Playing,
+    Win,
+    Lose
+} GameState;
+
 typedef struct{
     Panel* panel_mat;
     int size_y;
@@ -8,7 +15,9 @@ typedef struct{
     int field_size_x;
     int cursor_row;
     int cursor_col;
+	int num_bomb;
+	GameState state;
 } GameBoard;
 
-void init(GameBoard* gb, int y, int x, int bomb_num);
-void mine_sweeper_cli(int y, int x, int bomb_num);
+void init(GameBoard* gb, int y, int x, int num_bomb);
+void mine_sweeper_cli(int y, int x, int num_bomb);

@@ -1,7 +1,5 @@
 #include "panel.h"
 
-#define itoc(i) ((i) + '0');
-
 void new_blank_panel(Panel* p){
     p->display = '#';
     p->bomb_value = 0;
@@ -26,7 +24,7 @@ void new_border_panel(Panel* p){
     p->is_flagged = false;
 }
 
-void flag(Panel* p){
+void flag_panel(Panel* p){
     if (!p->is_open) {
         if (p->is_flagged) {
             p->is_flagged = false;
@@ -39,7 +37,7 @@ void flag(Panel* p){
     }
 }
 
-bool open(Panel* p){
+bool open_panel(Panel* p){
     if (p->is_flagged){
         return true;
     }
