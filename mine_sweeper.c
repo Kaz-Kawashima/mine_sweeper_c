@@ -50,7 +50,9 @@ void set_bomb(GameBoard* gb){
         }
         Panel* p = get_panel(gb, row, col);
         if (!p->is_bomb) {
+            bool flag = p->is_flagged;
             new_bomb_panel(p);
+            p->is_flagged = flag;
             counter++;
         }
     }
@@ -185,7 +187,7 @@ void print_gb(GameBoard* gb) {
     //princ_cursor
     Panel* p = get_panel(gb, gb->cursor_row, gb->cursor_col);
     pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
-    if (!p->is_open && !p->is_flagged) {
+    if (!p->is_open) {
         buff[pos] = '@';
     }
     else if (p->is_open && !p->is_bomb) {
@@ -236,10 +238,10 @@ void print_gb_debug(GameBoard* gb) {
     buff[pos] = '^';
     //system("cls");    //windows
     //system("clear"); //linux
-    //princ_cursor
+    //print_cursor
     Panel* p = get_panel(gb, gb->cursor_row, gb->cursor_col);
     pos = (gb->field_size_x * 2 + 1) * gb->cursor_row + gb->cursor_col * 2;
-    if (!p->is_open && !p->is_flagged) {
+    if (!p->is_open) {
         buff[pos] = '@';
     }
     else if (p->is_open && !p->is_bomb) {
@@ -326,7 +328,7 @@ int open_around(GameBoard* gb, int y, int x) {
     for(int row = y - 1; row <= (y + 1); row++){
         for (int col = x - 1; col <= (x + 1); col++) {
             Panel* p = get_panel(gb, row, col);
-            if (!p->is_open) {
+            if (!p->is_open && !p->is_flagged) {
                 open_panel(p);
                 counter++;
             }
